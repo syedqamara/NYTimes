@@ -25,7 +25,7 @@ public final class NYTListViewModel: NYTListViewModeling {
     }
     
     public func onAppear() {
-        guard !isLoading, articles.isEmpty else { return }
+        guard !isLoading, articles.isEmpty, error == nil else { return }
         isLoading = true
         cancellable = mostPopular.mostViewedArticlesPublisher(days: 1)
             .receive(on: RunLoop.main)

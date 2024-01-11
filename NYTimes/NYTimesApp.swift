@@ -11,30 +11,11 @@ import DebuggerUI
 
 @main
 struct NYTimesApp: App {
-    public init() {
-        loadConfigurations()
-        UINavigationBar.appearance().backgroundColor = .black
-        UINavigationBar.appearance().barTintColor = .black
-        UINavigationBar.appearance().tintColor = .black
-        UINavigationBar.appearance().isTranslucent = false
-        UINavigationBar.appearance().titleTextAttributes = [.foregroundColor: UIColor.white]
-    }
-    @Dependency(\.viewFactory) var viewFactory
+    
     var body: some Scene {
         WindowGroup {
-            NavigationUI {
-                AnyView(
-                    viewFactory.makeView(
-                        input: .list(isLoading: false, error: nil, articles: [])
-                    )
-                )
-            }
-            .background(.black)
+            NYTimesAppView(startScreen: .list(isLoading: false, error: nil, articles: []))
         }
-    }
-    func loadConfigurations() {
-        let networkConfig = NYTimesConfiguration()
-        networkConfig.config(name: "Most Viewed Api", endpoint: .mostViewed(), responseModel: NYTimesDM.self)
     }
 }
 

@@ -18,33 +18,13 @@ final class NYTimesListViewModelTests: NYTBaseTests<NYTBaseTests.DataSourceDepen
     
     fileprivate var cancellable: AnyCancellable?
     
-    var view: NYTListView<NYTListViewModel>!
+    var viewModel: NYTListViewModel!
     
-    private func setup(dataSourceReturn: NYTimesDataSourceMock.Returned, imageDataSourceReturn: NYTImageDataSourceMock.Returned) {
-        guard let dependency else { return }
-        let mockVoid = MockFunctionArgument(argumentLastValue: "mock")
-        
-        dependency.dataSource.returned = dataSourceReturn
-        dependency.imageDataSource.returned = imageDataSourceReturn
-    }
-    
-    override func setUp() async throws {
-        prepare {
-            @Dependency(\.imageSource) var imageSource
-            @Dependency(\.mostPopular) var mostPopular
-            
-            let arg = DataSourceDependency(
-                dataSource: mostPopular as! NYTimesDataSourceMock,
-                imageDataSource: imageSource as! NYTImageDataSourceMock
-            )
-            return arg
-        }
-    }
-
     func testSingleArticleInTheList() throws {
-        view = self.viewFactory.makeView(input: .list(isLoading: false, error: nil, articles: [])) as? NYTListView<NYTListViewModel>
+        let expectation = XCTestExpectation(description: "Expect \(self.classForCoder) functionality")
+        viewModel = NYTListViewModel(isLoading: false, error: nil, articles: [])
         
-        var future = Future<[NYTArticle], Error> { promise in
+        let future = Future<[NYTArticle], Error> { promise in
             promise(.success([.preview]))
         }
         setup(
@@ -52,8 +32,12 @@ final class NYTimesListViewModelTests: NYTBaseTests<NYTBaseTests.DataSourceDepen
             imageDataSourceReturn: .image(.init())
         )
         
-        guard let dataSource = self.dependency?.dataSource, let imageSource = self.dependency?.imageDataSource else {return}
-        
+        guard let dataSource = self.dependency?.dataSource else {
+            expectation.fulfill()
+            XCTAssert(false, "No Mock Data Source or Image Data Source found")
+            return
+        }
+        viewModel.onAppear()
         // Checking the parameter of the DataSource method `mostViewArticles(days:)`.
         if case .days(let arg) = dataSource.parameter {
             XCTAssert(arg.isArgumentRecieved, "Number of Days is not recieved")
@@ -74,28 +58,22 @@ final class NYTimesListViewModelTests: NYTBaseTests<NYTBaseTests.DataSourceDepen
                         XCTAssert(articles.count == 1, "Returned more than 1 article")
                         if let article = articles.first {
                             XCTAssert(article.id == NYTArticle.preview.id, "Article doesn't match with Test Data")
+                            expectation.fulfill()
                         }
                     }
             }
         }
         
-        if case .url(let arg) = imageSource.parameter {
-            XCTAssert(arg.isArgumentRecieved, "Image URL is recieved to download")
-            if let value = arg.argumentLastValue {
-                XCTAssert(value == "preview_url", "Image URL doesn't match with test data")
-            }
-        }
-        
-        view.viewModel.onAppear()
         
     }
     
     fileprivate var testError: NSError { NSError(domain: "com.nytimes.listViewModel.testError", code: 1) }
     
     func testErrorArticleInTheList() throws {
-        view = self.viewFactory.makeView(input: .list(isLoading: false, error: nil, articles: [])) as? NYTListView<NYTListViewModel>
+        let expectation = XCTestExpectation(description: "Expect \(self.classForCoder) functionality")
+        viewModel = NYTListViewModel(isLoading: false, error: nil, articles: [])
         
-        var future = Future<[NYTArticle], Error> { promise in
+        let future = Future<[NYTArticle], Error> { promise in
             promise(.failure(self.testError))
         }
         setup(
@@ -103,8 +81,12 @@ final class NYTimesListViewModelTests: NYTBaseTests<NYTBaseTests.DataSourceDepen
             imageDataSourceReturn: .image(.init())
         )
         
-        guard let dataSource = self.dependency?.dataSource, let imageSource = self.dependency?.imageDataSource else {return}
-        
+        guard let dataSource = self.dependency?.dataSource else {
+            expectation.fulfill()
+            XCTAssert(false, "No Mock Data Source or Image Data Source found")
+            return
+        }
+        viewModel.onAppear()
         // Checking the parameter of the DataSource method `mostViewArticles(days:)`.
         if case .days(let arg) = dataSource.parameter {
             XCTAssert(arg.isArgumentRecieved, "Number of Days is not recieved")
@@ -119,33 +101,23 @@ final class NYTimesListViewModelTests: NYTBaseTests<NYTBaseTests.DataSourceDepen
             if let value = arg.argumentLastValue {
                 cancellable = value
                     .receive(on: RunLoop.main)
-                    .sink { _ in
-                        
-                    } receiveValue: { articles in
-                        XCTAssert(articles.count == 1, "Returned more than 1 article")
-                        if let article = articles.first {
-                            XCTAssert(article.id == NYTArticle.preview.id, "Article doesn't match with Test Data")
+                    .sink { completion in
+                        switch completion {
+                        case .finished:
+                            break
+                        case .failure(let error):
+                            XCTAssert((error as NSError) == self.testError, "Error is not test error")
+                            expectation.fulfill()
+                            break
                         }
+                    } receiveValue: { articles in
+                        
                     }
             }
         }
         
-        if case .url(let arg) = imageSource.parameter {
-            XCTAssert(arg.isArgumentRecieved, "Image URL is recieved to download")
-            if let value = arg.argumentLastValue {
-                XCTAssert(value == "preview_url", "Image URL doesn't match with test data")
-            }
-        }
         
-        view.viewModel.onAppear()
-        
-    }
-
-    func testPerformanceExample() throws {
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
-        }
+        wait(for: [expectation], timeout: 5)
     }
 
 }

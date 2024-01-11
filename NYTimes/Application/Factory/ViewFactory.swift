@@ -13,10 +13,10 @@ public enum DebuggerViewFactoryInput {
 case breakpoint, debug(NetworkDebuggerActions)
 }
 extension SwiftUIViewFactory {
-    enum NYTViewsInput {
+    public enum NYTViewsInput {
     case list(isLoading: Bool, error: String?, articles: [NYTArticleUIM]), detail(NYTArticleUIM?)
     }
-    func makeView(input: NYTViewsInput) -> any SwiftUIView {
+    public func makeView(input: NYTViewsInput) -> any SwiftUIView {
         switch input {
         case .list(let isLoading, let error, let articles):
             return NYTViewModule<NYTListView<NYTListViewModel>>(

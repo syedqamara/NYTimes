@@ -40,7 +40,7 @@ extension NYTimesDataSourceMock: NYTimesDataSourcing {
             if let value = arg.argumentLastValue {
                 arg.invoked(by: value)
             } else {
-                arg.invoked(by: 0)
+                arg.invoked(by: days)
             }
         }
         if case .mostViewed(let arg)  = returned {

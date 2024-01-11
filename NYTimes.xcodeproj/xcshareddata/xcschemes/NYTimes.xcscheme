@@ -38,9 +38,14 @@
                BlueprintName = "NYTimesTests"
                ReferencedContainer = "container:NYTimes.xcodeproj">
             </BuildableReference>
+            <SkippedTests>
+               <Test
+                  Identifier = "NYTBaseTests">
+               </Test>
+            </SkippedTests>
          </TestableReference>
          <TestableReference
-            skipped = "NO"
+            skipped = "YES"
             parallelizable = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"

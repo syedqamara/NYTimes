@@ -9,6 +9,7 @@ import Foundation
 import SwiftUI
 import core_architecture
 import Dependencies
+import DebuggerUI
 
 public struct NYTListView<VM: NYTListViewModeling>: SwiftUIView {
     @Dependency(\.viewFactory) var viewFactory
@@ -28,6 +29,7 @@ public struct NYTListView<VM: NYTListViewModeling>: SwiftUIView {
                 Text(error)
                     .font(.title)
                     .foregroundColor(.red)
+                    .padding()
             }else {
                 ScrollView {
                     ForEach(viewModel.articles) { article in
@@ -56,76 +58,37 @@ public struct NYTListView<VM: NYTListViewModeling>: SwiftUIView {
             .navigationTitle("NYTimes Article Detail")
             .navigationBarTitleDisplayMode(.inline)
         } label: {
-            articleView(article: article)
+            NYTArticleView(article: article)
         }
     }
-    
-    @ViewBuilder
-    func articleView(article: NYTArticleUIM) -> some View {
-        HStack {
-            // Rounded Image
-            if let imageURL = article.media?.last?.mediaMetadata?.last?.url {
-                RemoteImage(
-                    url: imageURL,
-                    lottiePlaceholder: Lotties.loading,
-                    size: CGSize(width: 50, height: 50)
-                )
-                .frame(width: 50, height: 50)
-                .clipShape(Circle())
-                .padding(.vertical)
-                .padding(.horizontal, 10)
-            } else {
-                Image(systemName: "person.circle.fill")
-                    .resizable()
-                    .frame(width: 50, height: 50)
-                    .clipShape(Circle())
-                    .padding(.vertical)
-                    .padding(.horizontal, 10)
-            }
-            
-            
-            
-            // VStack with Title, Subtitle, and HStack
-            VStack(alignment: .leading, spacing: 8) {
-                Text(article.title ?? "")
-                    .font(.subheadline.bold())
-                    .foregroundColor(.black)
-                    .multilineTextAlignment(.leading)
-                
-                Text(article.byline ?? "")
-                    .font(.subheadline)
-                    .foregroundColor(.gray)
-                    .multilineTextAlignment(.leading)
-                
-                HStack {
-                    // Author Name and Date
-                    Text("\(article.source ?? "")")
-                        .font(.callout.bold())
-                        .foregroundColor(.gray)
-                        .lineLimit(1)
-                    Spacer()
-                    HStack {
-                        Image(systemName: "calendar")
-                            .resizable()
-                            .frame(width: 15, height: 15)
-                            .foregroundColor(.gray)
-                        Text("\(article.publishedDate ?? "")")
-                            .font(.callout.bold())
-                            .foregroundColor(.gray)
-                            .lineLimit(1)
-                    }
-                }
-            }
-            Spacer()
-            // Arrow
-            Image(systemName: "chevron.right")
-                .resizable()
-                .font(.title.bold())
-                .frame(width: 10, height: 15)
-                .foregroundColor(.gray)
-                .padding(.trailing)
-        }
-    }
-    
 }
 
+
+public struct NYTListView_Previews: PreviewProvider {
+    @Dependency(\.viewFactory) static var viewFactory
+    public static var previews: some View {
+        snapshots.previews.previewLayout(.sizeThatFits)
+    }
+    public struct Input {
+        public let isLoading: Bool
+        public let error: String?
+        public let articles: [NYTArticleUIM]
+        public init(isLoading: Bool, error: String?, articles: [NYTArticleUIM]) {
+            self.isLoading = isLoading
+            self.error = error
+            self.articles = articles
+        }
+    }
+    public static var snapshots: Previewer<Input> {
+        .init(
+            configurations: [
+                .init(name: "Preview Loading", state: .init(isLoading: true, error: nil, articles: [])),
+                .init(name: "Preview Error", state: .init(isLoading: false, error: "This is a preview error", articles: [])),
+                .init(name: "Preview Article", state: .init(isLoading: false, error: nil, articles: [.init(dataModel: .preview), .init(dataModel: .preview), .init(dataModel: .preview)]))
+            ]) { input in
+                NYTListView(
+                    viewModel: NYTListViewModel(isLoading: input.isLoading, error: input.error, articles: input.articles)
+                )
+            }
+    }
+}
