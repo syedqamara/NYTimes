@@ -69,7 +69,7 @@ See the code bellow on how to register a network configuration.
         public init() {}
         func config(name: String, endpoint: NYTimesEndpoint, responseModel: DataModelProtocol.Type,
             do {
-                try self.networkRegisterar.networkRegister(name: name, host: NYTimesHost(), endpoint:
+                try self.networkRegisterar.networkRegister(name: name, host: NYTimesHost(), endpoint: endpoint, method: method, contentType: contentType, responseType: responseModel, cachePolicy: cachePolicy, headers: headers)
             }
             catch let err {
                 fatalError("NYTimesConfiguration error \(err)")
