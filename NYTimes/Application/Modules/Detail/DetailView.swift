@@ -87,14 +87,15 @@ struct InformationRow: View {
     let value: String?
 
     var body: some View {
-        if let value {
+        if let value, value.isNotEmpty {
             HStack {
                 Text("\(label):")
                     .font(.subheadline)
+                    .fontWeight(.bold)
                 Spacer()
                 Text(value)
                     .font(.subheadline)
-                    .fontWeight(.bold)
+                    .multilineTextAlignment(.trailing)
             }
             .padding()
             .background(Color.gray.opacity(0.1))
