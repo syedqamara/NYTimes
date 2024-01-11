@@ -14,7 +14,6 @@ public struct NYTimesAppView: View {
     public let startScreen: SwiftUIViewFactory.NYTViewsInput
     public init(startScreen: SwiftUIViewFactory.NYTViewsInput) {
         self.startScreen = startScreen
-        loadConfigurations()
         UINavigationBar.appearance().backgroundColor = .black
         UINavigationBar.appearance().barTintColor = .black
         UINavigationBar.appearance().tintColor = .black
@@ -31,10 +30,6 @@ public struct NYTimesAppView: View {
             )
         }
         .background(.black)
-    }
-    func loadConfigurations() {
-        let networkConfig = NYTimesConfiguration()
-        networkConfig.config(name: "Most Viewed Api", endpoint: .mostViewed(), responseModel: NYTimesDM.self)
     }
 }
 

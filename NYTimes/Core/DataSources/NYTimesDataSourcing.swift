@@ -1,5 +1,5 @@
 //
-//  NYTimesService.swift
+//  NYTimesDataSourcing.swift
 //  NYTimes
 //
 //  Created by Apple on 10/01/2024.
