@@ -10,12 +10,12 @@ import Dependencies
 
 enum NYTimesDataSourceKey: DependencyKey, TestDependencyKey {
     static var liveValue: any NYTimesDataSourcing = NYTimesDataSources()
-    static var testValue: any NYTimesDataSourcing = NYTimesDataSources()
+    static var testValue: any NYTimesDataSourcing = NYTimesDataSourceMock(parameter: .days(.init()), returned: .mostViewed(.init()))
 }
 
 enum NYTimesImageDataSourceKey: DependencyKey, TestDependencyKey {
     static var liveValue: any NYTimesImageDataSourcing = NYTimesImageDataSource()
-    static var testValue: any NYTimesImageDataSourcing = NYTimesImageDataSource()
+    static var testValue: any NYTimesImageDataSourcing = NYTImageDataSourceMock(parameter: .url(.init()), returned: .image(.init()))
 }
 
 

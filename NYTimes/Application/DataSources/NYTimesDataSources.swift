@@ -15,20 +15,20 @@ public class NYTimesDataSources: NYTimesDataSourcing {
     
     @Dependency(\.defaultNetwork) var networking
     public init() {}
-    public func mostViewedArticles(days: Int) async throws -> [NYTArticle] {
-        let response = try await networking.send(to: NYTimesEndpoint.mostViewed(days), with: nil, type: NYTimesDM.self)
-        guard let result = response.results else {
-            throw SystemError.custom(NSError(domain: "com.nytimes.most-popular.data-source.no-results", code: 1))
-        }
-        return result
-    }
     // Combine Wrapper for service
     func mostViewedArticlesPublisher(days: Int) -> Future<[NYTArticle], Error> {
-        return Future { promise in
+        return Future {
+            [networking]
+            promise in
             Task {
                 do {
-                    let articles = try await self.mostViewedArticles(days: days)
-                    promise(.success(articles))
+                    let response = try await networking.send(to: NYTimesEndpoint.mostViewed(days), with: nil, type: NYTimesDM.self)
+                    if let results = response.results {
+                        promise(.success(results))
+                    }
+                    else {
+                        promise(.failure(SystemError.custom(NSError(domain: "com.dataSource.noResults", code: -100))))
+                    }
                 }
                 catch let error {
                     promise(.failure(error))
