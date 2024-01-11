@@ -19,6 +19,15 @@
       }
     },
     {
+      "identity" : "lottie-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/airbnb/lottie-ios",
+      "state" : {
+        "branch" : "master",
+        "revision" : "2562590cdf597277efbd3d9edaa65931b7cfd5b7"
+      }
+    },
+    {
       "identity" : "managedappconfiglib",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/jamf/ManagedAppConfigLib",
