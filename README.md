@@ -60,9 +60,7 @@ This library introduces abstract layers for MVVM protocols, caching mechanisms, 
     }
     ```
 
-- **Networking:** Includes configurations and endpoints for making network requests to The New York Times API.
-To allow add any Rest API with application's Network Library we need to register network configuration for each API before launching the application. 
-See the code bellow on how to register a network configuration.
+- **Networking:** The project encompasses configurations and endpoints essential for initiating network requests to The New York Times API. To integrate any additional REST API with the application's network library, it is imperative to register the network configuration for each API prior to launching the application. Refer to the code snippet below for guidance on registering a network configuration professionally:
     ``` swift
     public struct NYTimesConfiguration {
         @Dependency(\.registerar) private var networkRegisterar

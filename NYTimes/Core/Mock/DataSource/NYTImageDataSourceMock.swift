@@ -37,7 +37,7 @@ extension NYTImageDataSourceMock: NYTimesImageDataSourcing {
             if let value = arg.argumentLastValue {
                 arg.invoked(by: value)
             } else {
-                arg.invoked(by: UUID().uuidString)
+                arg.invoked(by: urlString)
             }
         }
         // Returning a custom return
